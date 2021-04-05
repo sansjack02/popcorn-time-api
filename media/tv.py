@@ -20,6 +20,19 @@ class Torrent:
     magnet: str
     quality: str
 
+@dataclass
+class Rating:
+    percentage: str
+    watching: str
+    votes: str
+    loved: str
+    hated: str
+
+@dataclass
+class Images:
+    poster: str
+    fanart: str
+    banner: str
 
 @dataclass
 class Show:
@@ -29,11 +42,11 @@ class Show:
     imbd: str
     title: str
     season_count: str
-    torrent: Torrent
+    torrent: list[Torrent]
 
 class TV:
     """
-    TV/Series Class 
+    TV/Series/Show Class 
     URL=[tv-v2.api-fetch]
     """
 
@@ -42,10 +55,25 @@ class TV:
 
     def GetShow(self, imbd_id : str) -> Show:
         res = SendRequest(self.url, "show/" + imbd_id)
+
         if not res:
             raise f"Failed To Get Show [{imbd_id}]"
-        torrent = Torrent()
-        return Show(res["imdb_id"], res["title"], res["num_seasons"], list[Torrent] )
+
+        # torrent = Torrent()
+        torrents = [e["torrents"] for e in res["episodes"] ]
+        
+        torrent_list = []
+
+        for torr in torrents:
+            torrent_list.append([ Torrent(
+            torr[x]["provider"],
+            torr[x]["peers"],
+            torr[x]["seeds"],
+            torr[x]["url"], x ) for x in torr])
+
+
+
+        return Show(res["imdb_id"], res["title"], res["num_seasons"], [ t for t in torrent_list] )
 
     def GetPopular(self, page : str = "1"):
         res = SendRequest(self.url, "shows/" + page)
