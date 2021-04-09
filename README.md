@@ -1,2 +1,4 @@
 # PopcornTimeAPI
-python3.9 wrapper for popcorn time api
+### Python3.9 Wrapper For Popcorn Time Api
+
+[Popcorn Time API Docs](https://popcorntime.api-docs.io)
